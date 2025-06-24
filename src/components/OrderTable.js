@@ -1,9 +1,8 @@
 import React from 'react';
 import '../styles/Orders.css';
 
-const OrderTable = ({ orders, title, onComplete, onDelete, onPrintKitchenReceipt, onMoveToRecurring }) => {
-  // Determine if Actions column should be shown
-  const showActions = onComplete || onDelete || onMoveToRecurring;
+const OrderTable = ({ orders, title, onComplete, onDelete, onPrintKitchenReceipt, onReprint, onMoveToRecurring }) => {
+  const showActions = onComplete || onDelete || onPrintKitchenReceipt || onReprint || onMoveToRecurring;
 
   return (
     <div className="order-table">
@@ -41,6 +40,18 @@ const OrderTable = ({ orders, title, onComplete, onDelete, onPrintKitchenReceipt
                         style={{ marginRight: '5px' }}
                       >
                         ✔ Accept
+                      </button>
+                    )}
+                    {onReprint && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Are you sure you want to reprint this receipt?')) {
+                            onReprint(order.tableNo);
+                          }
+                        }}
+                        style={{ marginRight: '5px' }}
+                      >
+                        🖨 Reprint
                       </button>
                     )}
                     {onMoveToRecurring && (

@@ -30,8 +30,8 @@ const QRCode = () => {
   useEffect(() => {
     fetchTables();
 
-    if (!user?.upiId || !user?.googleReviewLink) {
-      setAlert('Please add UPI ID and Google Review Link in Account settings to generate QR codes.');
+    if (!user?.upiId) {
+      setAlert('Please add UPI ID in Account settings to generate QR codes.');
     } else {
       setAlert('');
     }

@@ -12,11 +12,12 @@ const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
   isVeg: yup.boolean().required('Veg/non-veg status is required'),
   price: yup.number().positive('Price must be positive').required('Price is required'),
+  isEnabled: yup.boolean().optional(),
 });
 
 const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);
-  const [formData, setFormData] = useState({ category: '', name: '', isVeg: true, price: '' });
+  const [formData, setFormData] = useState({ category: '', name: '', isVeg: true, price: '', isEnabled: true });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -56,7 +57,7 @@ const Menu = () => {
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       setMenuItems([...menuItems, res.data]);
-      setFormData({ category: '', name: '', isVeg: true, price: '' });
+      setFormData({ category: '', name: '', isVeg: true, price: '', isEnabled: true });
       toast.success('Menu item added');
     } catch (error) {
       if (error.name === 'ValidationError') {
@@ -78,6 +79,22 @@ const Menu = () => {
       toast.success('Menu item deleted');
     } catch (error) {
       toast.error('Failed to delete menu item');
+    }
+    setLoading(false);
+  };
+
+  const handleToggleEnable = async (id) => {
+    setLoading(true);
+    try {
+      const res = await axios.put(
+        `${process.env.REACT_APP_API_URL}/menu/${id}/toggle`,
+        {},
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      setMenuItems(menuItems.map((item) => (item.id === id ? res.data : item)));
+      toast.success(`Menu item ${res.data.isEnabled ? 'enabled' : 'disabled'} successfully`);
+    } catch (error) {
+      toast.error('Failed to toggle menu item');
     }
     setLoading(false);
   };
@@ -136,9 +153,24 @@ const Menu = () => {
             step="0.01"
             required
           />
+          <div className="checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                name="isEnabled"
+                checked={formData.isEnabled}
+                onChange={handleChange}
+              />
+              Enabled
+            </label>
+          </div>
           <button type="submit">Add Item</button>
         </form>
-        <MenuTable menuItems={menuItems} onDelete={handleDelete} />
+        <MenuTable
+          menuItems={menuItems}
+          onDelete={handleDelete}
+          onToggleEnable={handleToggleEnable}
+        />
         <footer className="page-footer">
           Powered by SAE. All rights reserved.
         </footer>

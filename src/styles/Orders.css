@@ -11,18 +11,49 @@
   min-height: 100vh;
 }
 
-.orders-content h2 {
-  color: #2c3e50;
+.orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
 }
 
+.orders-content h2 {
+  color: #2c3e50;
+  margin-bottom: 0;
+}
+
+.take-order-btn {
+  padding: 0.75rem 1.5rem;
+  background: #55c1ef;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.take-order-btn:hover {
+  background: #1d4999;
+}
+
+.order-table-container {
+  max-height: 240px; /* Approx 5 rows at ~40px each + header */
+  overflow-y: auto;
+  margin-bottom: 2rem;
+}
+
+.order-table-container.past-orders-table {
+  max-height: 880px; /* Approx 20 rows at ~40px each + header */
+}
+
 .order-table {
-  margin-bottom: 3rem;
+  margin-bottom: 0; /* Remove margin as container handles spacing */
 }
 
 .order-table h3 {
   color: #34495e;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .order-table table {
@@ -42,6 +73,9 @@
 .order-table th {
   background: #2c3e50;
   color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .order-table td {
@@ -66,16 +100,18 @@
 .recurring-receipt-container {
   display: flex;
   gap: 2rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
-.recurring-orders {
+.receipt-section {
   flex: 1;
+  display: flex;
+  gap: 1.5rem;
 }
 
-.receipt-printing {
+.receipt-form-container {
   flex: 1;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.55);
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -100,6 +136,17 @@
   resize: vertical;
 }
 
+.receipt-form .gst-type {
+  display: flex;
+  gap: 1rem;
+}
+
+.receipt-form .gst-type label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .receipt-form button {
   padding: 0.75rem;
   background: #55c1ef;
@@ -114,8 +161,93 @@
   background: #1d4999;
 }
 
+.receipt-preview {
+  flex: 2;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+}
+
+.receipt-preview h3 {
+  color: #34495e;
+  margin-bottom: 1rem;
+}
+
+.receipt-preview-content {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  width: 80mm;
+  margin: 0 auto;
+  line-height: 1.4;
+}
+
+.receipt-preview-content .receipt-container {
+  border: 1px solid #000;
+  padding: 5px;
+}
+
+.receipt-preview-content .header {
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.receipt-preview-content .details,
+.receipt-preview-content .footer {
+  margin: 5px 0;
+}
+
+.receipt-preview-content .details p {
+  margin: 2px 0;
+  word-wrap: break-word;
+}
+
+.receipt-preview-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 5px 0;
+}
+
+.receipt-preview-content th,
+.receipt-preview-content td {
+  border: 1px solid #000;
+  padding: 3px;
+  text-align: left;
+}
+
+.receipt-preview-content th {
+  background-color: #eee;
+}
+
+.receipt-preview-content .qty { width: 15%; }
+.receipt-preview-content .item { width: 40%; }
+.receipt-preview-content .price { width: 25%; text-align: right; }
+.receipt-preview-content .amount { width: 20%; text-align: right; }
+.receipt-preview-content .total-table td {
+  text-align: right;
+}
+.receipt-preview-content .total-table .label { text-align: left; }
+.receipt-preview-content .message {
+  text-align: center;
+  font-style: italic;
+  margin-top: 5px;
+}
+.receipt-preview-content .divider {
+  border-top: 1px dashed #000;
+  margin: 5px 0;
+}
+
+.receipt-preview-content .preview-placeholder {
+  text-align: center;
+  color: #34495e;
+  font-style: italic;
+}
+
 .past-orders-container {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .past-orders-header {
@@ -158,13 +290,11 @@
   position: relative;
 }
 
-/* Custom styling for the date picker icon */
 .date-filter-container input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(130deg) brightness(95%) contrast(80%);
   cursor: pointer;
 }
 
-/* Hover and focus effects */
 .date-filter-container input[type="date"]:hover {
   border-color: #1d4999;
 }
@@ -197,4 +327,58 @@
   color: #34495e;
   font-size: 0.9rem;
   margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .orders-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+
+  .orders-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .take-order-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .recurring-receipt-container {
+    flex-direction: column;
+  }
+
+  .receipt-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .receipt-preview {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-table th,
+  .order-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .order-table button {
+    padding: 0.3rem;
+    font-size: 0.8rem;
+  }
+
+  .receipt-form select,
+  .receipt-form input,
+  .receipt-form textarea {
+    font-size: 0.8rem;
+  }
+
+  .receipt-form button {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
 }
