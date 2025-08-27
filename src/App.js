@@ -31,7 +31,7 @@ const PrivateRoute = ({ children }) => {
 
 const App = () => {
   return (
-    <Router>
+    <Router baseline ="/app">
       <AuthProvider>
         <div className="app">
           <Routes>
