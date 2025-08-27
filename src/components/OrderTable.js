@@ -1,9 +1,9 @@
+// admin-frontend/src/components/OrderTable.js
 import React from 'react';
 import '../styles/Orders.css';
 
-const OrderTable = ({ orders, title, onComplete, onDelete, onPrintKitchenReceipt, onMoveToRecurring }) => {
-  // Determine if Actions column should be shown
-  const showActions = onComplete || onDelete || onMoveToRecurring;
+const OrderTable = ({ orders, title, onComplete, onDelete, onPrintKitchenReceipt, onReprint, onMoveToRecurring, isPast = false }) => {
+  const showActions = onComplete || onDelete || onPrintKitchenReceipt || onReprint || onMoveToRecurring;
 
   return (
     <div className="order-table">
@@ -13,7 +13,7 @@ const OrderTable = ({ orders, title, onComplete, onDelete, onPrintKitchenReceipt
           <tr>
             <th>Table No.</th>
             <th>Items</th>
-            <th>Total</th>
+            <th>{isPast ? 'Grand Total' : 'Total'}</th>
             <th>Date & Time</th>
             {showActions && <th>Action</th>}
           </tr>
@@ -27,8 +27,10 @@ const OrderTable = ({ orders, title, onComplete, onDelete, onPrintKitchenReceipt
             orders.map((order) => (
               <tr key={order.id}>
                 <td>{order.tableNo}</td>
-                <td>{order.items.map((item) => `${item.name} (x${item.quantity})`).join(', ')}</td>
-                <td>₹{order.total.toFixed(2)}</td>
+                <td>
+                  {order.items.map((item) => `${item.name}${item.portion ? ` (${item.portion})` : ''} (x${item.quantity})`).join(', ')}
+                </td>
+                <td>₹{(isPast && order.receiptDetails ? order.receiptDetails.total : order.total).toFixed(2)}</td>
                 <td>{new Date(order.createdAt).toLocaleString()}</td>
                 {showActions && (
                   <td>
@@ -41,6 +43,18 @@ const OrderTable = ({ orders, title, onComplete, onDelete, onPrintKitchenReceipt
                         style={{ marginRight: '5px' }}
                       >
                         ✔ Accept
+                      </button>
+                    )}
+                    {onReprint && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Are you sure you want to reprint this receipt?')) {
+                            onReprint(order.tableNo);
+                          }
+                        }}
+                        style={{ marginRight: '5px' }}
+                      >
+                        🖨 Reprint
                       </button>
                     )}
                     {onMoveToRecurring && (

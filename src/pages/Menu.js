@@ -1,3 +1,4 @@
+// admin-frontend/src/pages/Menu.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as yup from 'yup';
@@ -12,11 +13,27 @@ const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
   isVeg: yup.boolean().required('Veg/non-veg status is required'),
   price: yup.number().positive('Price must be positive').required('Price is required'),
+  hasHalf: yup.boolean().optional().default(false),
+  halfPrice: yup.number().when('hasHalf', {
+    is: true,
+    then: (schema) => schema.positive('Half price must be positive').required('Half price is required'),
+    otherwise: (schema) => schema.nullable(),
+  }),
+  isEnabled: yup.boolean().optional(),
 });
 
 const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);
-  const [formData, setFormData] = useState({ category: '', name: '', isVeg: true, price: '' });
+  const [formData, setFormData] = useState({
+    category: '',
+    name: '',
+    isVeg: true,
+    price: '',
+    hasHalf: false,
+    halfPrice: '',
+    isEnabled: true,
+  });
+  const [editingItem, setEditingItem] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -49,23 +66,53 @@ const Menu = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await schema.validate(formData, { abortEarly: false });
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/menu`,
-        { ...formData, price: parseFloat(formData.price) },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
-      setMenuItems([...menuItems, res.data]);
-      setFormData({ category: '', name: '', isVeg: true, price: '' });
-      toast.success('Menu item added');
+      const data = {
+        ...formData,
+        price: parseFloat(formData.price) || 0,
+        halfPrice: formData.hasHalf ? parseFloat(formData.halfPrice) || 0 : null,
+      };
+      await schema.validate(data, { abortEarly: false });
+      let res;
+      if (editingItem) {
+        res = await axios.put(
+          `${process.env.REACT_APP_API_URL}/menu/${editingItem.id}`,
+          data,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+        setMenuItems(menuItems.map((item) => (item.id === editingItem.id ? res.data : item)));
+        toast.success('Menu item updated');
+        setEditingItem(null);
+      } else {
+        res = await axios.post(
+          `${process.env.REACT_APP_API_URL}/menu`,
+          data,
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        );
+        setMenuItems([...menuItems, res.data]);
+        toast.success('Menu item added');
+      }
+      setFormData({ category: '', name: '', isVeg: true, price: '', hasHalf: false, halfPrice: '', isEnabled: true });
     } catch (error) {
       if (error.name === 'ValidationError') {
         error.inner.forEach((err) => toast.error(err.message));
       } else {
-        toast.error('Failed to add menu item');
+        toast.error(error.response?.data?.details || error.response?.data?.error || 'Failed to add/update menu item');
       }
     }
     setLoading(false);
+  };
+
+  const handleEdit = (item) => {
+    setFormData({
+      category: item.category,
+      name: item.name,
+      isVeg: item.isVeg,
+      price: item.price.toString(),
+      hasHalf: item.hasHalf,
+      halfPrice: item.halfPrice ? item.halfPrice.toString() : '',
+      isEnabled: item.isEnabled,
+    });
+    setEditingItem(item);
   };
 
   const handleDelete = async (id) => {
@@ -78,6 +125,22 @@ const Menu = () => {
       toast.success('Menu item deleted');
     } catch (error) {
       toast.error('Failed to delete menu item');
+    }
+    setLoading(false);
+  };
+
+  const handleToggleEnable = async (id) => {
+    setLoading(true);
+    try {
+      const res = await axios.put(
+        `${process.env.REACT_APP_API_URL}/menu/${id}/toggle`,
+        {},
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      setMenuItems(menuItems.map((item) => (item.id === id ? res.data : item)));
+      toast.success(`Menu item ${res.data.isEnabled ? 'enabled' : 'disabled'} successfully`);
+    } catch (error) {
+      toast.error('Failed to toggle menu item');
     }
     setLoading(false);
   };
@@ -130,15 +193,53 @@ const Menu = () => {
           <input
             type="number"
             name="price"
-            placeholder="Price"
+            placeholder="Full Price"
             value={formData.price}
             onChange={handleChange}
             step="0.01"
             required
           />
-          <button type="submit">Add Item</button>
+          <div className="checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                name="hasHalf"
+                checked={formData.hasHalf}
+                onChange={handleChange}
+              />
+              Enable Half Portion
+            </label>
+          </div>
+          {formData.hasHalf && (
+            <input
+              type="number"
+              name="halfPrice"
+              placeholder="Half Price"
+              value={formData.halfPrice}
+              onChange={handleChange}
+              step="0.01"
+              required
+            />
+          )}
+          <div className="checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                name="isEnabled"
+                checked={formData.isEnabled}
+                onChange={handleChange}
+              />
+              Enabled
+            </label>
+          </div>
+          <button type="submit">{editingItem ? 'Update Item' : 'Add Item'}</button>
         </form>
-        <MenuTable menuItems={menuItems} onDelete={handleDelete} />
+        <MenuTable
+          menuItems={menuItems}
+          onDelete={handleDelete}
+          onToggleEnable={handleToggleEnable}
+          onEdit={handleEdit}
+        />
         <footer className="page-footer">
           Powered by SAE. All rights reserved.
         </footer>

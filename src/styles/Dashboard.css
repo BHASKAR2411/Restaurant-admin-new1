@@ -22,29 +22,101 @@
   margin-bottom: 2rem;
 }
 
-.stats-boxes {
+.analytics-controls {
+  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.analytics-controls label {
+  display: flex;
+  flex-direction: column;
+  color: #34495e;
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.analytics-controls input[type="date"],
+.analytics-controls select {
+  padding: 0.5rem;
+  border: 1px solid #55c1ef;
+  border-radius: 4px;
+  background: #fff;
+  color: #34495e;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.analytics-controls input[type="date"]:hover,
+.analytics-controls select:hover {
+  border-color: #1d4999;
+}
+
+.analytics-controls input[type="date"]:focus,
+.analytics-controls select:focus {
+  outline: none;
+  border-color: #1d4999;
+  box-shadow: 0 0 5px rgba(29, 73, 153, 0.3);
+}
+
+.earnings-figures {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
 }
 
-.stats-box {
-  background: white;
-  padding: 1.5rem;
+.figure-card {
+  background: rgba(255, 255, 255, 0.5);
+  padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
-.stats-box h3 {
+.figure-card h3 {
+  color: #34495e;
   margin-bottom: 0.5rem;
-  color: #2c3e50;
+  font-size: 1rem;
 }
 
-.stats-box p {
-  font-size: 1.5rem;
-  color: #55c1ef;
+.figure-card p {
+  font-size: 1.2rem;
+  color: #1d4999;
+  font-weight: bold;
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.chart-card {
+  flex: 1;
+  min-width: 300px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card h3 {
+  color: #34495e;
+  margin-bottom: 1rem;
 }
 
 .view-orders-btn {
@@ -68,4 +140,46 @@
   color: #34495e;
   font-size: 0.9rem;
   margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .earnings-figures {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-container {
+    flex-direction: column;
+  }
+
+  .analytics-controls {
+    max-width: 100%;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .analytics-controls label {
+    flex: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-content h2 {
+    font-size: 1.2rem;
+  }
+
+  .figure-card p {
+    font-size: 1rem;
+  }
+
+  .view-orders-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
 }

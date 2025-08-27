@@ -23,10 +23,10 @@ const Plans = () => {
   }, [location.state]);
 
   const plans = [
-    { type: 'free_trial', name: '15 Days Free Trial', price: 0, duration: '15 days' },
-    { type: '1_month', name: '1 Month Plan', price: 199, duration: '30 days' },
-    { type: '6_months', name: '6 Months Plan', price: 999, duration: '180 days' },
-    { type: '1_year', name: '1 Year Plan', price: 1650, duration: '365 days' },
+    { type: 'free_trial', name: '10 Days Free Trial', price: 0, duration: '10 days' },
+    { type: '1_month', name: '1 Month Plan', price: 599, duration: '30 days' },
+    { type: '6_months', name: '6 Months Plan', price: 2999, duration: '180 days' },
+    { type: '1_year', name: '1 Year Plan', price: 4499, duration: '365 days' },
   ];
 
   const handlePlanSelect = (planType) => {
